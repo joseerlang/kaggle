@@ -8,4 +8,4 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 - Descarga datos
 - Exploración datos
 - Sample submission (baseline) -> 0.5
-- Baseline Keras -> 0.764
+- Baseline Keras: resnet50 congelada, cabeza lineal entrenada en subset 224px, adam 1e-3, batch size 64 -> 0.764

@@ -1,0 +1,7 @@
+data
+*.csv
+*.jpg
+.ipynb_checkpoints
+__pycache__
+*.h5
+*.pth

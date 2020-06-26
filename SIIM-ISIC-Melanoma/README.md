@@ -13,7 +13,5 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 # Día 2
 
 - Mejora dataset (más rápido), guardar mejor modelo durante el entrenamiento para cargar al final [aquí](./keras_baseline2.ipynb)
-- kaggle notebook entrenando backbone y usando todo el dataset
 - cross validation con subsets
 - predicción ensamble
-- kaggle notebook con crossvalidation usando todo el dataset

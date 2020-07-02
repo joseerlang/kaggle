@@ -12,6 +12,6 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 
 # Día 2
 
-- Mejora dataset (más rápido), guardar mejor modelo durante el entrenamiento para cargar al final [aquí](./keras_baseline2.ipynb)
-- cross validation con subsets
-- predicción ensamble
+- Mejora dataset (más rápido), guardar mejor modelo durante el entrenamiento para cargar al final [aquí](./keras_baseline2.ipynb) -> 0.782
+- 3 fold cross validation, predicción ensamble [aquí](./keras_cv.ipynb): resnet50 congelada, cabeza lineal entrenada en subsets 224px, adam 1e-3, batch size 64 -> 0.811
+- 5 fold cross validation, predicción ensamble, resnet50 congelada, cabeza lineal entrenada en subsets 224px, adam 1e-3, batch size 64 -> 0.827 (no hay notebook, pero lo he probado)

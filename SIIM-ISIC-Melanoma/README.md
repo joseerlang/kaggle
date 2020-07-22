@@ -20,8 +20,12 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 # Día 3
 
 - Añadimos [data augmentation](./keras_data_augmentation.ipynb)
-  - flip horizontal + flip vertical tf -> 0.7976
+  - flip horizontal + flip vertical tf -> 0.7972
   - random flip keras -> 0.7873
 - Añadimos [TTA](./keras_tta.ipynb) con flip horizontal y vertical -> 0.8060
 - Usamos todos los datos de train -> 0.8485
 
+# Día 4
+
+- Añadimos metadatos en baseline con data augmentation -> 0.8179 (test)
+- Todos los datos -> 0.8774

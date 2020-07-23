@@ -27,5 +27,5 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 
 # Día 4
 
-- Añadimos metadatos en baseline con data augmentation -> 0.8179 (test)
+- Añadimos metadatos en baseline con data augmentation -> 0.8179
 - Todos los datos -> 0.8774

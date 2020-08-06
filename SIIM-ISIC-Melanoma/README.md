@@ -33,5 +33,8 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 # Día 5
 
 - [Pytorch baseline](./pytorch_baseline.ipynb) -> 0.7436
+
+# Día 6
+
 - [Data Augmentation](./pytorch_da.ipynb) -> 0.7209
 - [Metadata](./pytorch_meta.ipynb) -> 0.7524

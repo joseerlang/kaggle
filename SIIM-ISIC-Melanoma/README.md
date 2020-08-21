@@ -38,3 +38,22 @@ Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Cont
 
 - [Data Augmentation](./pytorch_da.ipynb) -> 0.7209
 - [Metadata](./pytorch_meta.ipynb) -> 0.7524
+
+# Día 7
+
+Se acabó la competición. Revisamos soluciones ganadoras. Conclusiones:
+
+- Usar más datos si el reglamento lo permite
+- Modelos ensamblados
+- mucho TTA 
+- Pytorch + GPU + amp > tensorflow + TPU
+- EfficientNet B3-B7, se_resnext101, resnest101 > resnet
+- si tenemos diferentes fuentes de datos, tener modelos en el ensamblado con y sin.
+- con imágenes, diferentes modelos a diferentes resoluciones (de 512 para arriba si es posible)
+- mucho DA
+- hacer pipelines que permitan rápida experimentación
+- si el dataset está desbalanceado, probar upsampling
+- learning rates scheduling, Adam 3e-4
+- re-entrenar backbone
+- pseudolabeling
+- weight averaging

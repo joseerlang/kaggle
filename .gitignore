@@ -7,3 +7,5 @@ __pycache__
 *.pth
 checkpoints
 test_*.ipynb
+lightning_logs
+*.pt 

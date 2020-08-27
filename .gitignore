@@ -9,3 +9,4 @@ checkpoints
 test_*.ipynb
 lightning_logs
 *.pt 
+Lyft*

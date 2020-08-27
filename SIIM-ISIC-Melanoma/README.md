@@ -53,7 +53,7 @@ Se acabó la competición. Revisamos soluciones ganadoras. Conclusiones:
 - mucho DA
 - hacer pipelines que permitan rápida experimentación
 - si el dataset está desbalanceado, probar upsampling
-- learning rates scheduling, Adam 3e-4
+- learning rate scheduling, Adam 3e-4
 - re-entrenar backbone
 - pseudolabeling
 - weight averaging

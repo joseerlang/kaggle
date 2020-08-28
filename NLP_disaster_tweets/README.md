@@ -8,5 +8,5 @@ En este challenge aprenderemos a hacer clasificación de texto. El dataset es pe
 - Descarga datos
 - Exploración de datos
 - Sample submission -> 0.57033
-- Baseline LSTM -> 0.73766
-- Baseline LSTM bidirectional -> 0.73766
+- Baseline LSTM -> 0.72326
+- Baseline LSTM bidirectional -> 0.73797

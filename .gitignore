@@ -11,3 +11,4 @@ lightning_logs
 *.pt 
 wandb
 Lyft*
+.vector_cache

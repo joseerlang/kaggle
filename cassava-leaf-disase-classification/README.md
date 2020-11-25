@@ -1,6 +1,4 @@
-Challenge: https://www.kaggle.com/c/siim-isic-melanoma-classification/
-
-Este es el dataset que usamos: https://www.kaggle.com/sensioai/melanoma224. Contiene las imágenes del dataset original re-escaladas a 224x224 píxeles.
+Challenge: https://www.kaggle.com/c/cassava-leaf-disease-classification/
 
 # Día 1
 

@@ -51,11 +51,11 @@ class DataModule(pl.LightningDataModule):
                 random_state = self.seed
             )
             train_imgs = [str(self.path/'train_images'/img) for img in subset['image_id'].values]
-            train_labels = subset['labels'].values
+            train_labels = subset['label'].values
             print("Training only on ", len(subset), " samples")
         else:
             train_imgs = [str(self.path/'train_images'/img) for img in train['image_id'].values]
-            train_labels = train['labels'].values
+            train_labels = train['label'].values
         # train dataset
         self.train_dataset = Dataset(train_imgs, train_labels)
         # val dataset

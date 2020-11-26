@@ -4,15 +4,13 @@ import torch.nn.functional as F
 from pytorch_lightning.metrics.functional.classification import accuracy
 import torch
 from torchvision import transforms
-
+from efficientnet_pytorch import EfficientNet
 
 class Model(pl.LightningModule):
 
     def __init__(self, config):
         super().__init__()
         self.save_hyperparameters(config)
-        self.resnet = getattr(torchvision.models, self.hparams.backbone)(pretrained=True)
-        self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 5)
         self.trans_train = torch.nn.Sequential(
             transforms.RandomResizedCrop(self.hparams.size),
             transforms.RandomHorizontalFlip(),
@@ -24,9 +22,6 @@ class Model(pl.LightningModule):
             #)
         )
         self.trans_test = transforms.CenterCrop(self.hparams.size)
-
-    def forward(self, x):
-        return self.resnet(x)
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -50,3 +45,21 @@ class Model(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
         return optimizer
+
+
+class Resnet(Model):
+    def __init__(self, config):
+        super().__init__(config)
+        self.resnet = getattr(torchvision.models, self.hparams.backbone)(pretrained=True)
+        self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 5)
+    
+    def forward(self, x):
+        return self.resnet(x)
+
+class Efficientnet(Model):
+    def __init__(self, config):
+        super().__init__(config)
+        self.en = EfficientNet.from_pretrained(self.hparams.backbone, num_classes=5)
+    
+    def forward(self, x):
+        return self.en(x)

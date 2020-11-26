@@ -3,7 +3,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
-from src import DataModule, Model
+from src import DataModule, Resnet, Efficientnet
 
 config = {
     'lr': 3e-4,
@@ -15,17 +15,17 @@ config = {
     'test_size': 0.2,
     'seed': 42,
     'size': 256,
-    'backbone': 'resnet18'
+    'backbone': 'efficientnet-b4'
 }
 
 dm = DataModule(**config)
 
-model = Model(config)
+model = Efficientnet(config)
 
 wandb_logger = WandbLogger(project="cassava", config=config)
 
 es = EarlyStopping(monitor='val_acc', mode='max', patience=3)
-checkpoint = ModelCheckpoint(dirpath='./', filename=f'{config["backbone"]}-{{val_acc:.5f}}', save_top_k=1, monitor='val_acc', mode='max')
+checkpoint = ModelCheckpoint(dirpath='./', filename=f'{config["backbone"]}-{config["size"]}-{{val_acc:.5f}}', save_top_k=1, monitor='val_acc', mode='max')
 
 trainer = pl.Trainer(
     gpus=1,

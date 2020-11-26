@@ -14,7 +14,7 @@ class Model(pl.LightningModule):
         self.resnet = torchvision.models.resnet50(pretrained=True)
         self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 5)
         self.trans_train = torch.nn.Sequential(
-            transforms.RandomResizedCrop(256),
+            transforms.RandomResizedCrop(self.hparams.size),
             transforms.RandomHorizontalFlip(),
             #transforms.ColorJitter(
             #    brightness=0.2, 
@@ -23,7 +23,7 @@ class Model(pl.LightningModule):
             #    hue=0.1
             #)
         )
-        self.trans_test = transforms.CenterCrop(256)
+        self.trans_test = transforms.CenterCrop(self.hparams.size)
 
     def forward(self, x):
         return self.resnet(x)

@@ -7,13 +7,12 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from src import DataModule, Model
 
 config = {
-    # optimizer
     'lr': 3e-4,
-    'batch_size': 128,
-    # training
+    'batch_size': 64,
     'max_epochs': 50,
     'precision': 16,
-    'subset': 0.1
+    'subset': 0,
+    'size': 512
 }
 
 dm = DataModule(

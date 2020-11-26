@@ -7,20 +7,17 @@ import torchvision
 import os 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, imgs, labels=None, train=True):
+    def __init__(self, imgs, labels):
         self.imgs = imgs 
         self.labels = labels
-        self.train = train
 
     def __len__(self):
         return len(self.imgs)
 
     def __getitem__(self, ix):
         img = torchvision.io.read_image(self.imgs[ix]).float() / 255.
-        if self.train:
-            label = torch.tensor(self.labels[ix], dtype=torch.long)
-            return img, label
-        return img
+        label = torch.tensor(self.labels[ix], dtype=torch.long)
+        return img, label
 
 class DataModule(pl.LightningDataModule):
 
@@ -54,25 +51,19 @@ class DataModule(pl.LightningDataModule):
                 random_state = self.seed
             )
             train_imgs = [str(self.path/'train_images'/img) for img in subset['image_id'].values]
+            train_labels = subset['labels'].values
             print("Training only on ", len(subset), " samples")
         else:
             train_imgs = [str(self.path/'train_images'/img) for img in train['image_id'].values]
+            train_labels = train['labels'].values
         # train dataset
-        self.train_dataset = Dataset(train_imgs, train['label'].values)
+        self.train_dataset = Dataset(train_imgs, train_labels)
         # val dataset
         val_imgs = [str(self.path/'train_images'/img) for img in val['image_id'].values]
         self.val_dataset = Dataset(val_imgs, val['label'].values)
-        # test dataset
-        self.test_imgs_ids = os.listdir(self.path/'test_images')
-        test_imgs = [str(self.path/'test_images'/img) for img in self.test_imgs_ids]
-        self.test_dataset = Dataset(test_imgs, train=False)
-
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=10, pin_memory=True)
 
     def val_dataloader(self):
         return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=10, pin_memory=True)
-
-    def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=10, shuffle=False)

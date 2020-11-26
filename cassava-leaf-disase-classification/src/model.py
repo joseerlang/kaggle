@@ -11,7 +11,7 @@ class Model(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.save_hyperparameters(config)
-        self.resnet = torchvision.models.resnet50(pretrained=True)
+        self.resnet = getattr(torchvision.models, self.hparams.backbone)(pretrained=True)
         self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 5)
         self.trans_train = torch.nn.Sequential(
             transforms.RandomResizedCrop(self.hparams.size),
@@ -48,5 +48,5 @@ class Model(pl.LightningModule):
         self.log('val_acc', val_acc, prog_bar=True)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
+        optimizer = getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
         return optimizer

@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 import torch
 import torchvision 
 import os 
+from pathlib import Path
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, imgs, labels):
@@ -21,7 +22,7 @@ class Dataset(torch.utils.data.Dataset):
 
 class DataModule(pl.LightningDataModule):
 
-    def __init__(self, path, batch_size = 64, test_size = 0.2, seed = 42, subset=False):
+    def __init__(self, path=Path('data'), batch_size = 64, test_size = 0.2, seed = 42, subset=False, **kwargs):
         super().__init__()
         self.path = path
         self.batch_size = batch_size
@@ -63,7 +64,7 @@ class DataModule(pl.LightningDataModule):
         self.val_dataset = Dataset(val_imgs, val['label'].values)
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=10, pin_memory=True)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=20, pin_memory=True)
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=10, pin_memory=True)
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=20, pin_memory=True)

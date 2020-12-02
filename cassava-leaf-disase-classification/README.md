@@ -4,6 +4,5 @@ Challenge: https://www.kaggle.com/c/cassava-leaf-disease-classification/
 
 - Intro competi
 - Descarga datos
-- [Exploración datos](./data_exploration.ipynb)
-- [Baseline](./train_model.ipynb) -> 0.729
-  
+- [Exploración datos](./00_exploracion_datos.ipynb)
+- [Baseline](./01_entrenamiento_modelo.ipynb) -> 0.729

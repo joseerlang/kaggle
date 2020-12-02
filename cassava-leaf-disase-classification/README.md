@@ -14,4 +14,4 @@ Solución ganadora challenge anterior: https://www.kaggle.com/c/cassava-disease/
 
 - Descargamos datos extra
 - [Integración](./03_extra_data.ipynb) datos extra
-- [Baseline](./03_extra_data) con datos extra -> 0.762
+- [Baseline](./03_extra_data.py) con datos extra -> 0.762

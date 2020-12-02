@@ -8,31 +8,37 @@ import os
 from pathlib import Path
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, imgs, labels):
+    def __init__(self, path, imgs, labels, trans = None):
+        self.path = path
         self.imgs = imgs 
         self.labels = labels
+        self.trans = trans 
 
     def __len__(self):
         return len(self.imgs)
 
     def __getitem__(self, ix):
-        img = torchvision.io.read_image(self.imgs[ix]).float() / 255.
+        img = torchvision.io.read_image(f'{self.path}/{self.imgs[ix]}').float() / 255.
+        if self.trans:
+            img = self.trans(img)
         label = torch.tensor(self.labels[ix], dtype=torch.long)
         return img, label
 
 class DataModule(pl.LightningDataModule):
 
-    def __init__(self, path=Path('data'), batch_size = 64, test_size = 0.2, seed = 42, subset=False, **kwargs):
+    def __init__(self, path='data', file='train_old.csv', size = 256, batch_size = 64, test_size = 0.2, seed = 42, subset=False, **kwargs):
         super().__init__()
         self.path = path
+        self.file = file
         self.batch_size = batch_size
         self.test_size = test_size 
         self.seed = seed 
         self.subset = subset
+        self.size = size
 
     def setup(self, stage=None):
         # read csv file with imgs names and labels
-        df = pd.read_csv(self.path/'train.csv')
+        df = pd.read_csv(f'{self.path}/{self.file}')
         # split in train / val
         train, val = train_test_split(
             df, 
@@ -44,24 +50,28 @@ class DataModule(pl.LightningDataModule):
         print("Training samples: ", len(train))
         print("Validation samples: ", len(val))
         if self.subset:
-            _, subset = train_test_split(
+            _, train = train_test_split(
                 train, 
                 test_size=self.subset,
                 shuffle=True, 
                 stratify=train['label'],
                 random_state = self.seed
             )
-            train_imgs = [str(self.path/'train_images'/img) for img in subset['image_id'].values]
-            train_labels = subset['label'].values
-            print("Training only on ", len(subset), " samples")
-        else:
-            train_imgs = [str(self.path/'train_images'/img) for img in train['image_id'].values]
-            train_labels = train['label'].values
+            print("Training only on ", len(train), " samples")
         # train dataset
-        self.train_dataset = Dataset(train_imgs, train_labels)
+        train_trans = torchvision.transforms.CenterCrop(self.size)
+        self.train_dataset = Dataset(
+            self.path,
+            train['image_id'].values, 
+            train['label'].values,
+            train_trans)
         # val dataset
-        val_imgs = [str(self.path/'train_images'/img) for img in val['image_id'].values]
-        self.val_dataset = Dataset(val_imgs, val['label'].values)
+        val_trans = torchvision.transforms.CenterCrop(self.size)
+        self.val_dataset = Dataset(
+            self.path,
+            val['image_id'].values, 
+            val['label'].values,
+            val_trans)
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)

@@ -10,15 +10,9 @@ class Model(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.save_hyperparameters(config)
-        self.trans_train = torch.nn.Sequential(
-            transforms.CenterCrop(self.hparams.size)
-            # ...
-        )
-        self.trans_test = transforms.CenterCrop(self.hparams.size)
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        x = self.trans_train(x)
         y_hat = self(x)
         loss = F.cross_entropy(y_hat, y)
         acc = accuracy(y_hat, y)
@@ -28,7 +22,6 @@ class Model(pl.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        x = self.trans_test(x)
         y_hat = self(x)
         val_loss = F.cross_entropy(y_hat, y)
         val_acc = accuracy(y_hat, y)
@@ -36,9 +29,7 @@ class Model(pl.LightningModule):
         self.log('val_acc', val_acc, prog_bar=True)
 
     def configure_optimizers(self):
-        optimizer = getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
-        return optimizer
-
+        return getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
 
 class Resnet(Model):
     def __init__(self, config):

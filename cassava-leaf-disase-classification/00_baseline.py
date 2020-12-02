@@ -11,19 +11,19 @@ config = {
     'batch_size': 256,
     'max_epochs': 50,
     'precision': 16,
-    'subset': 0,
+    'subset': 0.1,
     'test_size': 0.2,
     'seed': 42,
     'size': 256,
-    'backbone': 'resnet50',
-    'val_batches': 1.
+    'backbone': 'resnet18',
+    'val_batches': 10
 }
 
 dm = DataModule(**config)
 
 model = Resnet(config)
 
-wandb_logger = WandbLogger(project="cassava", config=config)
+wandb_logger = WandbLogger(project="cassava", name="baseline", config=config)
 
 es = EarlyStopping(monitor='val_acc', mode='max', patience=3)
 checkpoint = ModelCheckpoint(dirpath='./', filename=f'{config["backbone"]}-{config["size"]}-{{val_acc:.5f}}', save_top_k=1, monitor='val_acc', mode='max')

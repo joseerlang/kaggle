@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from pytorch_lightning.metrics.functional.classification import accuracy
 import torch
 from torchvision import transforms
-from efficientnet_pytorch import EfficientNet
 
 class Model(pl.LightningModule):
 
@@ -12,14 +11,8 @@ class Model(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters(config)
         self.trans_train = torch.nn.Sequential(
-            transforms.RandomResizedCrop(self.hparams.size),
-            transforms.RandomHorizontalFlip(),
-            #transforms.ColorJitter(
-            #    brightness=0.2, 
-            #    contrast=0.2, 
-            #    saturation=0.1, 
-            #    hue=0.1
-            #)
+            transforms.CenterCrop(self.hparams.size)
+            # ...
         )
         self.trans_test = transforms.CenterCrop(self.hparams.size)
 
@@ -55,11 +48,3 @@ class Resnet(Model):
     
     def forward(self, x):
         return self.resnet(x)
-
-class Efficientnet(Model):
-    def __init__(self, config):
-        super().__init__(config)
-        self.en = EfficientNet.from_pretrained(self.hparams.backbone, num_classes=5)
-    
-    def forward(self, x):
-        return self.en(x)

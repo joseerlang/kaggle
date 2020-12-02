@@ -3,7 +3,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
-from src import DataModule, Resnet, Efficientnet
+from src import DataModule, Resnet
 
 config = {
     'lr': 3e-4,
@@ -11,12 +11,12 @@ config = {
     'batch_size': 256,
     'max_epochs': 50,
     'precision': 16,
-    'subset': 0,
+    'subset': 0.1,
     'test_size': 0.2,
     'seed': 42,
     'size': 256,
-    'backbone': 'resnet50',
-    'val_batches': 1.
+    'backbone': 'resnet18',
+    'val_batches': 10
 }
 
 dm = DataModule(**config)

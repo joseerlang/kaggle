@@ -23,7 +23,7 @@ dm = DataModule(**config)
 
 model = Resnet(config)
 
-wandb_logger = WandbLogger(project="cassava", name="baseline", config=config)
+wandb_logger = WandbLogger(project="cassava", config=config)
 
 es = EarlyStopping(monitor='val_acc', mode='max', patience=3)
 checkpoint = ModelCheckpoint(dirpath='./', filename=f'{config["backbone"]}-{config["size"]}-{{val_acc:.5f}}', save_top_k=1, monitor='val_acc', mode='max')

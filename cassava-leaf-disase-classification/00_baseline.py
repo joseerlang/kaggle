@@ -3,7 +3,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
-from src import DataModule, Resnet, Efficientnet
+from src import DataModule, Resnet
 
 config = {
     'lr': 3e-4,
@@ -34,7 +34,7 @@ trainer = pl.Trainer(
     logger= wandb_logger,
     max_epochs=config['max_epochs'],
     callbacks=[es, checkpoint],
-    limit_val_batches=config['val_batches'],
+    limit_val_batches=config['val_batches']
 )
 
 trainer.fit(model, dm)

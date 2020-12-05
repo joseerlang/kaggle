@@ -5,21 +5,44 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 from src import DataModule, Resnet
 
+size = 256
 config = {
+    # optimization
     'lr': 3e-4,
     'optimizer': 'Adam',
     'batch_size': 256,
-    'max_epochs': 50,
-    'precision': 16,
-    'subset': 0.1,
+    # data
+    'extra_data': 1,
+    'upsample': 0,
+    'subset': 0.,
     'test_size': 0.2,
     'seed': 42,
-    'size': 256,
-    'backbone': 'resnet18',
-    'val_batches': 10
+    # model
+    'backbone': 'resnet50',
+    # data augmentation
+    'size': size,
+    'train_trans': {
+        'RandomCrop': {
+            'size': size
+        }, 
+        'RandomHorizontalFlip': {},
+        'RandomVerticalFlip': {}
+    },
+    'val_trans': {
+        'CenterCrop': {
+            'size': size
+        }
+    },
+    # training params
+    'precision': 16,
+    'max_epochs': 50,
+    'val_batches': 1.0
 }
 
-dm = DataModule(**config)
+dm = DataModule(
+    file = 'train_extra.csv' if config['extra_data'] else 'train_old.csv', 
+    **config
+)
 
 model = Resnet(config)
 
@@ -34,7 +57,7 @@ trainer = pl.Trainer(
     logger= wandb_logger,
     max_epochs=config['max_epochs'],
     callbacks=[es, checkpoint],
-    limit_val_batches=config['val_batches'],
+    limit_val_batches=config['val_batches']
 )
 
 trainer.fit(model, dm)

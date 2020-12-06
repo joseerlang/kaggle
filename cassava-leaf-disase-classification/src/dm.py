@@ -113,4 +113,4 @@ class DataModule(pl.LightningDataModule):
         return DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, pin_memory=True)
 
     def val_dataloader(self):
-        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, pin_memory=True)

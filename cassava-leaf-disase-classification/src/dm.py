@@ -9,6 +9,7 @@ from pathlib import Path
 import math
 import cv2 
 import albumentations as A 
+from albumentations.pytorch import ToTensorV2
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, path, imgs, labels, trans=None):
@@ -34,33 +35,54 @@ class Dataset(torch.utils.data.Dataset):
 
 class DataModule(pl.LightningDataModule):
 
-    def __init__(self, train_data, val_data, path='data', batch_size=64, subset=False, train_trans=None, val_trans=None, **kwargs):
+    def __init__(
+            self,
+            path='data',
+            file='train_extra.csv',
+            batch_size=64,
+            test_size=0.2,
+            seed=42,
+            subset=False,
+            train_trans=None,
+            val_trans=None,
+            **kwargs):
         super().__init__()
         self.path = path
+        self.file = file
         self.batch_size = batch_size
+        self.test_size = test_size
+        self.seed = seed
         self.subset = subset
-        self.train_data = train_data
-        self.val_data = val_data
         self.train_trans = train_trans
         self.val_trans = val_trans
 
     def setup(self, stage=None):
-        print("Training samples: ", len(self.train_data))
-        print("Validation samples: ", len(self.val_data))
+        # read csv file with imgs names and labels
+        df = pd.read_csv(f'{self.path}/{self.file}')
+        # split in train / val
+        train, val = train_test_split(
+            df,
+            test_size=self.test_size,
+            shuffle=True,
+            stratify=df['label'],
+            random_state=self.seed
+        )
+        print("Training samples: ", len(train))
+        print("Validation samples: ", len(val))
         if self.subset:
-            _, self.train_data = train_test_split(
-                self.train_data,
+            _, train = train_test_split(
+                train,
                 test_size=self.subset,
                 shuffle=True,
-                stratify=self.train_data['label'],
-                random_state=42
+                stratify=train['label'],
+                random_state=self.seed
             )
-            print("Training only on ", len(self.train_data), " samples")
+            print("Training only on ", len(train), " samples")
         # train dataset
         self.train_ds = Dataset(
             self.path,
-            self.train_data['image_id'].values,
-            self.train_data['label'].values,
+            train['image_id'].values,
+            train['label'].values,
             trans = A.Compose([
                 getattr(A, trans)(**params) for trans, params in self.train_trans.items()
             ]) if self.train_trans else None
@@ -68,8 +90,8 @@ class DataModule(pl.LightningDataModule):
         # val dataset
         self.val_ds=Dataset(
             self.path,
-            self.val_data['image_id'].values,
-            self.val_data['label'].values,
+            val['image_id'].values,
+            val['label'].values,
             trans = A.Compose([
                 getattr(A, trans)(**params) for trans, params in self.val_trans.items()
             ]) if self.val_trans else None

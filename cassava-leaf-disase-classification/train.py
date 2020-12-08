@@ -5,7 +5,8 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 from src import DataModule, Resnet
 
-size = 256
+size = 512
+
 config = {
     # optimization
     'lr': 3e-4,
@@ -22,7 +23,12 @@ config = {
     # data augmentation
     'size': size,
     'train_trans': {
-        'RandomCrop': {
+        'PadIfNeeded': {
+            'min_height': size, 
+            'min_width': size,
+            'border_mode': 0
+        },
+        'RandomResizedCrop': {
             'height': size, 
             'width': size
         },
@@ -30,6 +36,11 @@ config = {
         'VerticalFlip': {}
     },
     'val_trans': {
+        'PadIfNeeded': {
+            'min_height': size, 
+            'min_width': size,
+            'border_mode': 0
+        },
         'CenterCrop': {
             'height': size, 
             'width': size

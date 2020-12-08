@@ -14,7 +14,7 @@ config = {
     # data
     'extra_data': 1,
     'upsample': 0,
-    'subset': 0.,
+    'subset': 0.1,
     'test_size': 0.2,
     'seed': 42,
     # model
@@ -22,6 +22,11 @@ config = {
     # data augmentation
     'size': size,
     'train_trans': {
+        'PadIfNeeded': {
+            'min_height': size, 
+            'min_width': size,
+            'border_mode': 0 
+        },
         'RandomCrop': {
             'height': size, 
             'width': size
@@ -30,6 +35,11 @@ config = {
         'VerticalFlip': {}
     },
     'val_trans': {
+        'PadIfNeeded': {
+            'min_height': size, 
+            'min_width': size,
+            'border_mode': 0 
+        },
         'CenterCrop': {
             'height': size, 
             'width': size
@@ -38,7 +48,7 @@ config = {
     # training params
     'precision': 16,
     'max_epochs': 50,
-    'val_batches': 1.0
+    'val_batches': 10
 }
 
 dm = DataModule(

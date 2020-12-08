@@ -6,23 +6,24 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from src import DataModule, Resnet
 
 size = 256
-
 config = {
+    # optimization
     'lr': 3e-4,
     'optimizer': 'Adam',
     'batch_size': 256,
-    'max_epochs': 50,
-    'precision': 16,
+    # data
+    'extra_data': 1,
+    'upsample': 0,
     'subset': 0.1,
     'test_size': 0.2,
     'seed': 42,
-    'size': size,
+    # model
     'backbone': 'resnet18',
-    'val_batches': 10,
-    'extra_data': 1,
+    # data augmentation
+    'size': size,
     'train_trans': {
         'RandomCrop': {
-            'height': size,
+            'height': size, 
             'width': size
         },
         'HorizontalFlip': {},
@@ -30,10 +31,14 @@ config = {
     },
     'val_trans': {
         'CenterCrop': {
-            'height': size,
+            'height': size, 
             'width': size
         }
-    }
+    },
+    # training params
+    'precision': 16,
+    'max_epochs': 50,
+    'val_batches': 10
 }
 
 dm = DataModule(

@@ -5,6 +5,7 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 from src import DataModule, Resnet
 
+size = 256
 config = {
     'lr': 3e-4,
     'optimizer': 'Adam',
@@ -16,10 +17,26 @@ config = {
     'seed': 42,
     'size': 256,
     'backbone': 'resnet18',
-    'val_batches': 10
+    'val_batches': 10,
+    'extra_data': 0,
+    'train_trans': {
+        'CenterCrop': {
+            'height': size, 
+            'width': size
+        }
+    },
+    'val_trans': {
+        'CenterCrop': {
+            'height': size, 
+            'width': size
+        }
+    },
 }
 
-dm = DataModule(**config)
+dm = DataModule(
+    file = 'train_extra.csv' if config['extra_data'] else 'train_old.csv', 
+    **config
+)
 
 model = Resnet(config)
 

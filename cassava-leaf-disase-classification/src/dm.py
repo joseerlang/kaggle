@@ -45,7 +45,6 @@ class DataModule(pl.LightningDataModule):
             subset=False,
             train_trans=None,
             val_trans=None,
-            upsample=False,
             **kwargs):
         super().__init__()
         self.path = path
@@ -56,7 +55,6 @@ class DataModule(pl.LightningDataModule):
         self.subset = subset
         self.train_trans = train_trans
         self.val_trans = val_trans
-        self.upsample = upsample
 
     def setup(self, stage=None):
         # read csv file with imgs names and labels
@@ -80,16 +78,6 @@ class DataModule(pl.LightningDataModule):
                 random_state=self.seed
             )
             print("Training only on ", len(train), " samples")
-        if self.upsample:
-            mul = train.label.value_counts().max() / train.label.value_counts() 
-            train_full = train.copy()
-            for l, m in mul.items():
-                if m > 1:
-                    train_lab = pd.concat([train[train.label == l]]*math.floor(m-1), ignore_index=True)
-                    train_full = pd.concat([train_full, train_lab])
-            train = train_full
-            print("Upsampled samples: ", len(train))
-            print(train.label.value_counts())
         # train dataset
         self.train_ds = Dataset(
             self.path,

@@ -13,7 +13,6 @@ config = {
     'batch_size': 256,
     # data
     'extra_data': 1,
-    'upsample': 0,
     'subset': 0.1,
     'test_size': 0.2,
     'seed': 42,

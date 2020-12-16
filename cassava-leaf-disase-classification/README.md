@@ -20,3 +20,16 @@ Solución ganadora challenge anterior: https://www.kaggle.com/c/cassava-disease/
 
 - [Data Augmentation](./04_da.py)
 - [TTA](./05_tta.ipynb) -> 0.815
+
+# Día 4
+
+Hacemos cross validation
+
+1. Sacar train/val en extra data
+2. Cambiar dm para leer directamente train/val
+3. update código previo para que funcione
+4. añadir stratified cv
+5. predicción con modelo ensamblado
+
+- 5 fold resnet18 subset 256 da ->
+- - 5 fold resnet18 subset 256 da tta ->

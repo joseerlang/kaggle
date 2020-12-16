@@ -14,8 +14,7 @@ config = {
     # data
     'extra_data': 1,
     'subset': 0.1,
-    'test_size': 0.2,
-    'seed': 42,
+    'num_workers': 0,
     # model
     'backbone': 'resnet18',
     # data augmentation
@@ -41,9 +40,10 @@ config = {
 }
 
 dm = DataModule(
-    file = 'train_extra.csv' if config['extra_data'] else 'train_old.csv', 
+    file = 'data_extra' if config['extra_data'] else 'data_old', 
     **config
 )
+
 
 model = Resnet(config)
 

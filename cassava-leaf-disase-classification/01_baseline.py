@@ -13,8 +13,7 @@ config = {
     'max_epochs': 50,
     'precision': 16,
     'subset': 0.1,
-    'test_size': 0.2,
-    'seed': 42,
+    'num_workers': 0,
     'size': 256,
     'backbone': 'resnet18',
     'val_batches': 10,
@@ -34,7 +33,7 @@ config = {
 }
 
 dm = DataModule(
-    file = 'train_extra.csv' if config['extra_data'] else 'train_old.csv', 
+    file = 'data_extra' if config['extra_data'] else 'data_old', 
     **config
 )
 

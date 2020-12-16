@@ -32,4 +32,4 @@ Hacemos cross validation
 5. predicción con modelo ensamblado
 
 - 5 fold resnet18 subset 256 da ->
-- - 5 fold resnet18 subset 256 da tta ->
+- 5 fold resnet18 subset 256 da tta ->

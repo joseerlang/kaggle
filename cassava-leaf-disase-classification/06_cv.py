@@ -9,26 +9,22 @@ import pandas as pd
 
 from src import DataModule, Resnet
 
-size = 512
+size = 256
 config = {
     # optimization
     'lr': 3e-4,
     'optimizer': 'Adam',
-    'batch_size': 64,
+    'batch_size': 256,
     # data
     'extra_data': 1,
-    'subset': 0,
+    'subset': 0.1,
     'num_workers': 0,
     # model
-    'backbone': 'resnet50',
+    'backbone': 'resnet18',
     # data augmentation
     'size': size,
     'train_trans': {
-        'PadIfNeeded': {
-            'min_width': size,
-            'min_height': size
-        },
-        'RandomResizedCrop': {
+        'RandomCrop': {
             'height': size, 
             'width': size
         },
@@ -36,10 +32,6 @@ config = {
         'VerticalFlip': {}
     },
     'val_trans': {
-        'PadIfNeeded': {
-            'min_width': size,
-            'min_height': size
-        },
         'CenterCrop': {
             'height': size, 
             'width': size
@@ -48,7 +40,7 @@ config = {
     # training params
     'precision': 16,
     'max_epochs': 50,
-    'val_batches': 1.0,
+    'val_batches': 10,
     'folds': 5
 }
 

@@ -38,35 +38,26 @@ class DataModule(pl.LightningDataModule):
     def __init__(
             self,
             path='data',
-            file='train_extra.csv',
+            file='data_extra',
+            subset=0,
             batch_size=64,
-            test_size=0.2,
-            seed=42,
-            subset=False,
             train_trans=None,
             val_trans=None,
+            num_workers=1,
             **kwargs):
         super().__init__()
         self.path = path
         self.file = file
-        self.batch_size = batch_size
-        self.test_size = test_size
-        self.seed = seed
-        self.subset = subset
         self.train_trans = train_trans
+        self.subset = subset
         self.val_trans = val_trans
+        self.batch_size = batch_size
+        self.num_workers = 0
 
     def setup(self, stage=None):
-        # read csv file with imgs names and labels
-        df = pd.read_csv(f'{self.path}/{self.file}')
-        # split in train / val
-        train, val = train_test_split(
-            df,
-            test_size=self.test_size,
-            shuffle=True,
-            stratify=df['label'],
-            random_state=self.seed
-        )
+        # read csv files with imgs names and labels
+        train = pd.read_csv(f'{self.path}/{self.file}_train.csv')
+        val = pd.read_csv(f'{self.path}/{self.file}_val.csv')
         print("Training samples: ", len(train))
         print("Validation samples: ", len(val))
         if self.subset:
@@ -75,9 +66,10 @@ class DataModule(pl.LightningDataModule):
                 test_size=self.subset,
                 shuffle=True,
                 stratify=train['label'],
-                random_state=self.seed
+                random_state=42
             )
-            print("Training only on ", len(train), " samples")
+            print("Training only on", len(train), "samples")
+    
         # train dataset
         self.train_ds = Dataset(
             self.path,
@@ -98,7 +90,7 @@ class DataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+        return DataLoader(self.train_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True, pin_memory=True)
 
     def val_dataloader(self):
-        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, pin_memory=True)
+        return DataLoader(self.val_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, pin_memory=True)

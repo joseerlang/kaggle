@@ -20,3 +20,7 @@ Solución ganadora challenge anterior: https://www.kaggle.com/c/cassava-disease/
 
 - [Data Augmentation](./04_da.py)
 - [TTA](./05_tta.ipynb) -> 0.815
+
+# Día 4
+
+- [Validación Cruzada](./06_cv.py) -> corriendo...

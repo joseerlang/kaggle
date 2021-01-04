@@ -4,16 +4,40 @@ import torch.nn.functional as F
 from pytorch_lightning.metrics.functional.classification import accuracy
 import torch
 from torchvision import transforms
+import timm
 
 class Model(pl.LightningModule):
 
     def __init__(self, config):
         super().__init__()
         self.save_hyperparameters(config)
+        self.backbone = timm.create_model(
+            self.hparams.backbone, 
+            pretrained=self.hparams.pretrained, 
+            features_only=True
+        )
+        self.head = torch.nn.Sequential(
+            torch.nn.AdaptiveAvgPool2d(output_size=(1,1)),
+            torch.nn.Flatten(),
+            torch.nn.Linear(self.backbone.feature_info.channels(-1), 5)
+        )
+
+    def forward(self, x):
+        features = self.backbone(x)
+        return self.head(features[-1])
+
+    def extract_features(self, x):
+        if self.trainer.current_epoch < self.hparams.unfreeze:
+            with torch.no_grad():
+                features = self.backbone(x)
+        else: 
+            features = self.backbone(x)
+        return features
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self(x)
+        features = self.extract_features(x)
+        y_hat = self.head(features[-1])
         loss = F.cross_entropy(y_hat, y)
         acc = accuracy(y_hat, y)
         self.log('loss', loss)
@@ -29,13 +53,11 @@ class Model(pl.LightningModule):
         self.log('val_acc', val_acc, prog_bar=True)
 
     def configure_optimizers(self):
-        return getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
-
-class Resnet(Model):
-    def __init__(self, config):
-        super().__init__(config)
-        self.resnet = getattr(torchvision.models, self.hparams.backbone)(pretrained=True)
-        self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 5)
-    
-    def forward(self, x):
-        return self.resnet(x)
+        optimizer = getattr(torch.optim, self.hparams.optimizer)(self.parameters(), lr=self.hparams.lr)
+        if 'scheduler' in self.hparams:
+            schedulers = [
+                getattr(torch.optim.lr_scheduler, scheduler)(optimizer, **params)
+                for scheduler, params in self.hparams.scheduler.items()
+            ]
+            return [optimizer], schedulers 
+        return optimizer

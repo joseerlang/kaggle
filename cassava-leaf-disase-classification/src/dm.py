@@ -28,7 +28,7 @@ class Dataset(torch.utils.data.Dataset):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.trans:
             img = self.trans(image=img)['image']
-        img = torch.tensor(img / 255., dtype=torch.float).permute(2,0,1)
+        img = torch.tensor(img, dtype=torch.float).permute(2,0,1)
         label = torch.tensor(self.labels[ix], dtype=torch.long)
         return img, label
 
@@ -43,7 +43,8 @@ class DataModule(pl.LightningDataModule):
             batch_size=64,
             train_trans=None,
             val_trans=None,
-            num_workers=1,
+            num_workers=0,
+            pin_memory=False,
             **kwargs):
         super().__init__()
         self.path = path
@@ -52,7 +53,28 @@ class DataModule(pl.LightningDataModule):
         self.subset = subset
         self.val_trans = val_trans
         self.batch_size = batch_size
-        self.num_workers = 0
+        self.num_workers = num_workers
+        self.pin_memory = pin_memory
+        train = pd.read_csv(f'{self.path}/{self.file}_train.csv')
+        val = pd.read_csv(f'{self.path}/{self.file}_val.csv')
+        # train dataset
+        self.train_ds = Dataset(
+            self.path,
+            train['image_id'].values,
+            train['label'].values,
+            trans = A.Compose([
+                getattr(A, trans)(**params) for trans, params in self.train_trans.items()
+            ]) if self.train_trans else A.Normalize()
+        )
+        # val dataset
+        self.val_ds=Dataset(
+            self.path,
+            val['image_id'].values,
+            val['label'].values,
+            trans = A.Compose([
+                getattr(A, trans)(**params) for trans, params in self.val_trans.items()
+            ]) if self.val_trans else A.Normalize()
+        )
 
     def setup(self, stage=None):
         # read csv files with imgs names and labels
@@ -70,27 +92,10 @@ class DataModule(pl.LightningDataModule):
             )
             print("Training only on", len(train), "samples")
     
-        # train dataset
-        self.train_ds = Dataset(
-            self.path,
-            train['image_id'].values,
-            train['label'].values,
-            trans = A.Compose([
-                getattr(A, trans)(**params) for trans, params in self.train_trans.items()
-            ]) if self.train_trans else None
-        )
-        # val dataset
-        self.val_ds=Dataset(
-            self.path,
-            val['image_id'].values,
-            val['label'].values,
-            trans = A.Compose([
-                getattr(A, trans)(**params) for trans, params in self.val_trans.items()
-            ]) if self.val_trans else None
-        )
+
 
     def train_dataloader(self):
-        return DataLoader(self.train_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True, pin_memory=True)
+        return DataLoader(self.train_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True, pin_memory=self.pin_memory)
 
     def val_dataloader(self):
-        return DataLoader(self.val_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, pin_memory=True)
+        return DataLoader(self.val_ds, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, pin_memory=self.pin_memory)

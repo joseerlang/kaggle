@@ -1,34 +1,36 @@
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from sklearn.model_selection import StratifiedKFold
-import numpy as np
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
-from src import DataModule, Resnet
+from src import DataModule, Model
 
 size = 256
 config = {
     # optimization
-    'lr': 3e-4,
+    'lr': 1e-5,
     'optimizer': 'Adam',
-<<<<<<< HEAD
     'batch_size': 128,
+    'scheduler': {
+     'OneCycleLR': {
+         'max_lr': 5e-3,
+         'total_steps': 10,
+         'pct_start': 0.2,
+         'verbose': True
+     }
+    },
     # data
     'extra_data': 1,
-    'subset': 0.1,
-    'num_workers': 2,
-=======
-    'batch_size': 256,
-    # data
-    'extra_data': 1,
-    'subset': 0.1,
-    'num_workers': 4,
->>>>>>> bf917204ec5978b3df6c3862b3612e1759898a43
+    'subset': 0,
+    'num_workers': 20,
+    'pin_memory': True,
     # model
-    'backbone': 'resnet18',
+    'backbone': 'efficientnet_b2a',
+    'pretrained': True,
+    'unfreeze': 0,
     # data augmentation
     'size': size,
     'train_trans': {
@@ -37,18 +39,23 @@ config = {
             'width': size
         },
         'HorizontalFlip': {},
-        'VerticalFlip': {}
+        'VerticalFlip': {},
+        'Normalize': {}
     },
     'val_trans': {
         'CenterCrop': {
             'height': size, 
             'width': size
-        }
+        },
+        'Normalize': {}
     },
     # training params
+    'gpus': 1,
     'precision': 16,
-    'max_epochs': 50,
-    'val_batches': 10,
+    'max_epochs': 10,
+    'val_batches': 1.0,
+    'es_start_from': 3,
+    'patience': 3,
     'folds': 5
 }
 
@@ -62,7 +69,6 @@ for f, (train_index, val_index) in enumerate(skf.split(X=np.zeros(len(train)), y
 
     train_fold = train.iloc[train_index]
     val_fold = train.iloc[val_index]
-
     train_fold.to_csv(path/f'fold_{f+1}_train.csv')
     val_fold.to_csv(path/f'fold_{f+1}_val.csv')
 
@@ -71,24 +77,25 @@ for f, (train_index, val_index) in enumerate(skf.split(X=np.zeros(len(train)), y
         **config
     )
 
-    wandb_logger = WandbLogger(project="cassava", config=config)
-    es = EarlyStopping(monitor='val_acc', mode='max', patience=3)
+    model = Model(config)
+
+    #wandb_logger = WandbLogger(project="cassava", config=config)
+    #es = MyEarlyStopping(monitor='val_acc', mode='max', patience=config['patience'])
     checkpoint = ModelCheckpoint(
         dirpath='./', 
-        filename=f'{config["backbone"]}-{config["size"]}-{{val_acc:.5f}}-fold_{f+1}', 
-        save_top_k=1,
+        filename=f'{config["backbone"]}-{config["size"]}-fold_{f+1}-{{val_acc:.5f}}', 
+        save_top_k=1, 
         monitor='val_acc', 
-        mode='max'
-    )
-
-    model = Resnet(config)
+        mode='max')
+    #lr_monitor = LearningRateMonitor(logging_interval='step')
 
     trainer = pl.Trainer(
-        gpus=1,
+        gpus=config['gpus'],
         precision=config['precision'],
-        logger=wandb_logger,
+        #logger= wandb_logger,
         max_epochs=config['max_epochs'],
-        callbacks=[es, checkpoint],
+        #callbacks=[es, checkpoint, lr_monitor],
+        callbacks=[checkpoint],
         limit_val_batches=config['val_batches']
     )
 
